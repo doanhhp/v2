@@ -1,0 +1,103 @@
+/* ===== Base + Snap ===== */
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+  background:#ffffff; /* default baseline (matches page 2) */
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+section{scroll-snap-align:start;scroll-snap-stop:always}
+
+/* ===== HERO (page 1) — top→bottom pink→white gradient ===== */
+.hero{
+  position:relative;
+  min-height:100vh;
+  background: linear-gradient(to bottom, #ffd9e6 0%, #ffffff 100%);
+}
+#app{position:absolute;inset:0;width:100%;height:100%}
+canvas{display:block}
+.hero-overlay{position:relative;height:100vh;display:grid;place-items:end center;padding-bottom:24px;pointer-events:none}
+.scroll-cue{font-size:14px;color:#374151;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:10px}
+
+/* ===== LETTER (page 2) — solid white ===== */
+.letter-section{
+  background:#ffffff;
+  min-height:100vh; display:grid; place-items:center;
+  padding:180px 16px 120px;
+}
+
+/* Pastel palette + geometry */
+:root{
+  --env-base:#ffcbe6; --env-back:#f1b7d6; --env-light:#ffeef7;
+  --paper:#ffffff; --ink:#6b2b47; --title:#b21e63;
+  --front-height:78%; --seam-depth:64%; --flap-height:60%;
+  --flap-top:0%; --flap-closed:95%; --flap-open:-95%;
+  --letter-top:24%; --letter-bottom:6%;
+}
+
+.envelope{
+  position:relative;width:min(600px,85vw);aspect-ratio:3/2;height:auto;
+  overflow:hidden;transition:transform 650ms cubic-bezier(.2,.8,.2,1);
+  --flap-vertex:var(--flap-closed)
+}
+.envelope:hover{overflow:visible;transform:translateY(230px);--flap-vertex:var(--flap-open)}
+.env-back{
+  position:absolute;inset:0;background:var(--env-back);border-radius:10px;
+  box-shadow:0 18px 40px rgba(178,30,99,.10),0 6px 16px rgba(0,0,0,.06);z-index:0
+}
+
+.letter{
+  position:absolute;left:8%;right:8%;top:var(--letter-top);bottom:var(--letter-bottom);
+  background:var(--paper);border-radius:10px;box-shadow:0 10px 22px rgba(0,0,0,.06), inset 0 0 0 2px #ffd2e6;
+  color:var(--ink);padding:18px 22px;transform:translateY(20%) scale(1);
+  transition:transform 650ms cubic-bezier(.2,.8,.2,1);z-index:1;
+}
+.envelope:hover .letter{
+  transition:all 650ms cubic-bezier(.2,.8,.2,1), z-index 0s linear 650ms, transform 1.3s cubic-bezier(.2,.8,.2,1);
+  z-index:10; transform:translateY(calc(-60% - 160px)) scale(1.1)
+}
+.letter h1{margin:0 0 10px;font-size:26px;color:var(--title)}
+
+.env-front-rect{
+  position:absolute;left:0;right:0;bottom:0;height:var(--front-height);background:var(--env-base);
+  border-radius:0 0 10px 15px;box-shadow:inset 0 0 18px rgba(255,209,209,.7), inset 0 -10px 24px rgba(0,0,0,.06);z-index:2;
+}
+
+/* flap */
+.env-flap{
+  position:absolute;left:0;right:0;top:var(--flap-top);height:var(--flap-height);background:#ffeef7;
+  clip-path:polygon(0 0,100% 0,50% var(--flap-vertex));
+  transition:clip-path 650ms cubic-bezier(.165,.84,.44,1);filter:drop-shadow(0 8px 12px rgba(0,0,0,.05));z-index:4;
+}
+.env-flap::after{content:"";position:absolute;inset:0;background:var(--env-light);clip-path:inherit;transform:translateY(10px);opacity:.95}
+
+@media (max-width:640px){.letter h1{font-size:22px}}
+
+/* ===== GALLERY (page 3) ===== */
+.gallery-section{
+  position:relative;min-height:100vh;display:grid;place-items:center;padding:0;
+  background:transparent; /* this page uses its own gradient layer */
+}
+.gallery-bg{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  /* bottom→top gradient for page 3 */
+  background: linear-gradient(to top, #ffd9e6 0%, #ffffff 100%);
+}
+#gallery-app{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto;z-index:1}
+.gallery-overlay{
+  position:relative;z-index:2;text-align:center;padding:16px 20px;margin-top:clamp(16px,4vh,40px);
+  border-radius:16px;background:rgba(255,255,255,.55);backdrop-filter:blur(8px);box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+.gallery-overlay h2{margin:0 0 6px;font-weight:700;letter-spacing:.2px;color:#b21e63}
+.gallery-overlay p{margin:0;color:#6b2b47;font-size:14px;opacity:.8}
+
+/* ===== Debug overlay (only shows on load errors) ===== */
+.debug-toast{
+  position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+  background:#111;color:#fff;padding:10px 14px;border-radius:10px;
+  font-size:12px;line-height:1.3;z-index:9999;box-shadow:0 10px 25px rgba(0,0,0,.25);
+  max-width:min(92vw,800px);opacity:.95;white-space:pre-wrap
+}
